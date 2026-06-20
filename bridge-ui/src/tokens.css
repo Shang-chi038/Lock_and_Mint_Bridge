@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root,
+[data-theme="dark"] {
+  --bg-app:      #0A0E1A;
+  --bg-sidebar:  #0D1326;
+  --bg-card:     #111A33;
+  --bg-input:    #0D1426;
+  --bg-elevated: #16203D;
+  --border:        #1E2A4A;
+  --border-strong: #2A3A60;
+  --text-primary:   #F7FAFF;
+  --text-secondary: #9AA7C7;
+  --text-tertiary:  #5E6C8C;
+  --accent:       #6C4DF6;
+  --accent-hover: #5A3CE0;
+  --accent-soft:  rgba(108, 77, 246, 0.14);
+  --success: #2BD49B;
+  --danger:  #F0556B;
+  --warning: #F2B33D;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.24);
+  --shadow-pop:  0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] {
+  --bg-app:      #FFFFFF;
+  --bg-sidebar:  #F5F7FC;
+  --bg-card:     #FFFFFF;
+  --bg-input:    #F2F5FB;
+  --bg-elevated: #FFFFFF;
+  --border:        #E2E8F4;
+  --border-strong: #CBD5E8;
+  --text-primary:   #0A0E1A;
+  --text-secondary: #4A5878;
+  --text-tertiary:  #8A97B5;
+  --accent:       #6C4DF6;
+  --accent-hover: #5A3CE0;
+  --accent-soft:  rgba(108, 77, 246, 0.10);
+  --success: #15A97A;
+  --danger:  #D63C53;
+  --warning: #C98A12;
+  --shadow-card: 0 8px 32px rgba(20, 30, 60, 0.10);
+  --shadow-pop:  0 4px 16px rgba(20, 30, 60, 0.10);
+}

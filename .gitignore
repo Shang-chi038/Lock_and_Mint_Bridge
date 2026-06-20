@@ -1,0 +1,51 @@
+# Secrets — never commit these
+.env
+.env.local
+.env*.local
+
+# Dependencies
+node_modules/
+bridge-ui/node_modules/
+contracts/node_modules/
+relayer/node_modules/
+
+# Frontend build output
+bridge-ui/dist/
+bridge-ui/.vite/
+
+# Hardhat compile artifacts
+contracts/artifacts/
+contracts/cache/
+
+# Relayer state — contains pending nonces, not sensitive but no need to commit
+relayer/pending.json
+
+# Project notes
+todo.txt
+task.txt
+lock_*.txt
+lock_*.md
+presentation.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor files and folders
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# gstack folders
+gstack/
+**/gstack/
+
+# Claude note
+claude.md
