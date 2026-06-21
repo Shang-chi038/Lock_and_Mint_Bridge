@@ -39,8 +39,9 @@ export default function App() {
 
   // Poll MintContract on Amoy for confirmation once locked
   useEffect(() => {
-    if (lockedNonce === null || status !== 'LOCKED') {
+    if (lockedNonce === null) {
       clearInterval(pollRef.current)
+      clearInterval(countdownRef.current)
       return
     }
     setStatus('RELAYING')
@@ -79,7 +80,7 @@ export default function App() {
       clearInterval(pollRef.current)
       clearInterval(countdownRef.current)
     }
-  }, [lockedNonce, status])
+  }, [lockedNonce])
 
   async function connectWallet() {
     if (!window.ethereum) { alert('MetaMask not found — install it from metamask.io'); return }

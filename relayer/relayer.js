@@ -12,7 +12,8 @@ const {
 } = process.env;
 
 const PENDING_FILE = path.join(__dirname, "pending.json");
-const RETRY_INTERVAL_MS = 30_000; // retry failed mints every 30s
+const RETRY_INTERVAL_MS = 30_000;
+const inFlight = new Set(); // nonces currently being minted
 
 // ── Minimal ABIs (only what the relayer needs) ────────────────────────────────
 const LOCK_ABI = [
@@ -53,6 +54,8 @@ function removePending(nonce) {
 // ── Core: attempt one mint ────────────────────────────────────────────────────
 async function tryMint(mintContract, entry) {
   const { sender, amount, nonce } = entry;
+  if (inFlight.has(nonce)) return;
+  inFlight.add(nonce);
   console.log(`[mint] nonce=${nonce} recipient=${sender} amount=${amount}`);
 
   try {
@@ -71,6 +74,8 @@ async function tryMint(mintContract, entry) {
     removePending(nonce);
   } catch (err) {
     console.error(`[mint] nonce=${nonce} failed — will retry: ${err.message}`);
+  } finally {
+    inFlight.delete(nonce);
   }
 }
 
@@ -96,7 +101,8 @@ async function main() {
     process.exit(1);
   }
 
-  const sepoliaProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+  const sepoliaWsUrl    = SEPOLIA_RPC_URL.replace(/^https?:\/\//, "wss://");
+  const sepoliaProvider = new ethers.WebSocketProvider(sepoliaWsUrl);
   const amoyProvider    = new ethers.JsonRpcProvider(AMOY_RPC_URL);
   const amoyWallet      = new ethers.Wallet(PRIVATE_KEY, amoyProvider);
 
