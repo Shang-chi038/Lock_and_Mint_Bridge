@@ -1,4 +1,3 @@
-require("dotenv").config({ path: "../.env" });
 const { ethers } = require("ethers");
 const fs = require("fs");
 const path = require("path");
@@ -93,7 +92,7 @@ async function main() {
   }
   if (!LOCK_CONTRACT_ADDRESS || !MINT_CONTRACT_ADDRESS) {
     console.error("Missing env vars: LOCK_CONTRACT_ADDRESS, MINT_CONTRACT_ADDRESS");
-    console.error("Deploy contracts first, then fill .env");
+    console.error("Deploy contracts first, then set env vars");
     process.exit(1);
   }
 
@@ -130,3 +129,4 @@ main().catch((err) => {
   console.error("[relayer] fatal:", err);
   process.exit(1);
 });
+
