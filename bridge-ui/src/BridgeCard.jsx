@@ -71,7 +71,7 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
 
   // Fetch real TST balance on Sepolia
   useEffect(() => {
-    if (!account) { setBalance(0); return }
+    if (!account || !tstReadOnly) { setBalance(0); return }
     tstReadOnly.balanceOf(account)
       .then((raw) => setBalance(Number(ethers.formatUnits(raw, 18))))
       .catch(() => setBalance(0))
@@ -79,7 +79,7 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
 
   // Fetch real wTST balance on Amoy
   useEffect(() => {
-    if (!account) { setWBalance(0); return }
+    if (!account || !mintReadOnly) { setWBalance(0); return }
     mintReadOnly.balanceOf(account)
       .then((raw) => setWBalance(Number(ethers.formatUnits(raw, 18))))
       .catch((e) => { console.error('[wTST balance]', e); setWBalance(0) })

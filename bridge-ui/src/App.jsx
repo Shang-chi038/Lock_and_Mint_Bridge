@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Component } from 'react'
 import { ethers } from 'ethers'
 import Sidebar from './Sidebar'
 import NavBar from './NavBar'
@@ -9,6 +9,29 @@ import Swap from './Swap'
 import Transactions from './Transactions'
 import { mintReadOnly, getSignerContracts } from './contracts'
 import './App.css'
+
+class BridgeErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null } }
+  static getDerivedStateFromError(e) { return { error: e } }
+  componentDidCatch(e) { console.error('[BridgeCard error]', e) }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="card" style={{ textAlign: 'center', padding: '40px 24px' }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+          <div style={{ fontWeight: 700, marginBottom: 8 }}>Bridge failed to load</div>
+          <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginBottom: 20 }}>
+            {this.state.error.message}
+          </div>
+          <button className="cta" onClick={() => this.setState({ error: null })}>
+            Try again
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 const SEPOLIA_CHAIN_ID = '0xaa36a7'
 const POLL_INTERVAL_MS = 5000
@@ -101,6 +124,7 @@ export default function App() {
     // Mint confirmation poller
     pollRef.current = setInterval(async () => {
       try {
+        if (!mintReadOnly) return
         const done = await mintReadOnly.processed(lockedNonce)
         if (done) {
           clearInterval(pollRef.current)
@@ -180,6 +204,7 @@ export default function App() {
         <main className="content">
           {activeNav === 'bridge' && (
             <div className="content-inner">
+              <BridgeErrorBoundary>
               <BridgeCard
                 account={account}
                 network={network}
@@ -209,6 +234,7 @@ export default function App() {
                 countdown={countdown}
                 onRequestRefund={() => handleRefund(lockedNonce)}
               />
+              </BridgeErrorBoundary>
             </div>
           )}
           {activeNav === 'manage'       && <ManageTokens account={account} />}
