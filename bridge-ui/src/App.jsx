@@ -22,9 +22,45 @@ export default function App() {
   const [status,   setStatus]   = useState('IDLE')
   const [lockedNonce,   setLockedNonce]   = useState(null)
   const [countdown,     setCountdown]     = useState(null)
+  const [transactions,  setTransactions]  = useState(() => {
+    try { return JSON.parse(localStorage.getItem('ccb-txs') || '[]') } catch { return [] }
+  })
+  const [sidebarOpen,    setSidebarOpen]    = useState(false)
+  const [sidebarHovered, setSidebarHovered] = useState(false)
   const pollRef      = useRef(null)
   const countdownRef = useRef(null)
   const lockTimeRef  = useRef(null)
+  const hoverTimerRef = useRef(null)
+
+  const sidebarVisible = sidebarOpen || sidebarHovered
+
+  function handleMenuClick() {
+    setSidebarOpen(o => !o)
+    setSidebarHovered(false)
+  }
+  function handleSidebarHoverStart() {
+    clearTimeout(hoverTimerRef.current)
+    setSidebarHovered(true)
+  }
+  function handleSidebarHoverEnd() {
+    hoverTimerRef.current = setTimeout(() => setSidebarHovered(false), 150)
+  }
+
+  function addTransaction(tx) {
+    setTransactions(prev => {
+      const next = [tx, ...prev]
+      try { localStorage.setItem('ccb-txs', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
+  function updateTransaction(nonce, update) {
+    setTransactions(prev => {
+      const next = prev.map(t => t.nonce === nonce ? { ...t, ...update } : t)
+      try { localStorage.setItem('ccb-txs', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -71,6 +107,7 @@ export default function App() {
           clearInterval(countdownRef.current)
           setCountdown(null)
           setStatus('MINTED')
+          updateTransaction(lockedNonce, { status: 'completed' })
           setLockedNonce(null)
         }
       } catch {}
@@ -99,9 +136,11 @@ export default function App() {
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer   = await provider.getSigner()
       const { lock } = getSignerContracts(signer)
-      const tx = await lock.refund(nonce ?? lockedNonce)
+      const nonceToRefund = nonce ?? lockedNonce
+      const tx = await lock.refund(nonceToRefund)
       await tx.wait()
       setStatus('REFUNDED')
+      updateTransaction(nonceToRefund, { status: 'refunded' })
     } catch (e) {
       alert('Refund failed: ' + (e.reason || e.message))
     }
@@ -118,13 +157,25 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar active={activeNav} onNav={setActiveNav} />
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+      <Sidebar
+        active={activeNav}
+        onNav={(id) => { setActiveNav(id); setSidebarOpen(false) }}
+        mobileVisible={sidebarVisible}
+        onHoverStart={handleSidebarHoverStart}
+        onHoverEnd={handleSidebarHoverEnd}
+      />
       <div className="main">
         <NavBar
           theme={theme}
           onToggleTheme={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
           account={account}
           onConnect={connectWallet}
+          onMenuClick={handleMenuClick}
+          onMenuHoverStart={handleSidebarHoverStart}
+          onMenuHoverEnd={handleSidebarHoverEnd}
         />
         <main className="content">
           {activeNav === 'bridge' && (
@@ -137,7 +188,21 @@ export default function App() {
                 status={status}
                 onAdvance={advanceStatus}
                 onReset={resetBridge}
-                onLocked={(nonce) => { setLockedNonce(nonce); setStatus('LOCKED') }}
+                onLocked={({ nonce, hash, amount }) => {
+                  setLockedNonce(nonce)
+                  setStatus('LOCKED')
+                  addTransaction({
+                    id: Date.now(),
+                    nonce,
+                    hash,
+                    amount,
+                    token: 'TST',
+                    from: { chain: 'Sepolia', symbol: 'S', color: '#627EEA' },
+                    to:   { chain: 'Amoy',    symbol: 'A', color: '#8247E5' },
+                    status: 'pending',
+                    timestamp: Date.now(),
+                  })
+                }}
               />
               <BridgeTimeline
                 status={status}
@@ -148,7 +213,7 @@ export default function App() {
           )}
           {activeNav === 'manage'       && <ManageTokens account={account} />}
           {activeNav === 'swap'         && <Swap account={account} />}
-          {activeNav === 'transactions' && <Transactions account={account} />}
+          {activeNav === 'transactions' && <Transactions account={account} transactions={transactions} />}
         </main>
       </div>
     </div>

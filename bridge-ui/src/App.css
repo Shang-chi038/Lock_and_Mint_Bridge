@@ -1,9 +1,10 @@
 /* ── Layout ─────────────────────────────────────────── */
 .app        { display: flex; min-height: 100vh; }
-.main       { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.content    { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 28px 28px 40px; }
-.content-inner { display: flex; flex-direction: row; align-items: flex-start; gap: 20px; }
+.main       { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-x: hidden; }
+.content    { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 28px 28px 40px; overflow-x: auto; }
+.content-inner { display: flex; flex-direction: row; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
 .content-inner .timeline { width: 280px; flex: none; align-self: center; }
+.card { width: 440px; min-width: 0; flex: none; }
 
 /* ── Sidebar ─────────────────────────────────────────── */
 .sidebar {
@@ -271,6 +272,8 @@
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
 }
+.tx-card-clickable { cursor: pointer; transition: border-color .12s, transform .1s; }
+.tx-card-clickable:hover { border-color: var(--border-strong); transform: translateY(-1px); }
 .tx-route  { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
 .tx-chain-name { color: var(--text-secondary); }
 .tx-amounts { display: flex; align-items: center; gap: 10px; font-size: 14px; }
@@ -280,6 +283,120 @@
 .tx-time    { font-size: 12px; color: var(--text-tertiary); margin-right: auto; }
 .tx-hash    { font-size: 12px; color: var(--text-tertiary); font-family: monospace; }
 .tx-badge   { padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+
+/* Transaction detail */
+.tx-back-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 0; background: none; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 18px; transition: color .12s;
+}
+.tx-back-btn:hover { color: var(--text-primary); }
+.tx-detail-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 20px;
+}
+.tx-detail-top {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.tx-detail-rows { display: flex; flex-direction: column; gap: 0; }
+.tx-detail-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.tx-detail-row:last-child { border-bottom: none; }
+.tx-detail-label { font-size: 13px; color: var(--text-tertiary); }
+.tx-detail-value { font-size: 14px; font-weight: 600; }
+.tx-hash-section { display: flex; flex-direction: column; gap: 0; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.tx-hash-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.tx-hash-full {
+  flex: 1; min-width: 0; font-family: monospace; font-size: 12px;
+  color: var(--text-secondary); word-break: break-all; cursor: pointer;
+  transition: color .12s;
+}
+.tx-hash-full:hover { color: var(--text-primary); }
+.tx-copy-btn {
+  flex: none; width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-elevated);
+  color: var(--text-secondary); display: flex; align-items: center;
+  justify-content: center; cursor: pointer; transition: background .12s, color .12s;
+}
+.tx-copy-btn:hover { background: var(--bg-card); color: var(--text-primary); }
+.tx-copy-btn.copied { color: var(--success); border-color: var(--success); }
+.tx-etherscan-link {
+  display: inline-flex; align-items: center; font-size: 12px; font-weight: 600;
+  color: var(--accent); text-decoration: none; transition: opacity .12s;
+}
+.tx-etherscan-link:hover { opacity: .8; }
+
+/* ── Mobile menu button (logo in navbar) ─────────────── */
+.mobile-menu-btn {
+  display: none;
+  width: 34px; height: 34px; border-radius: 10px; flex: none;
+  background: linear-gradient(135deg, #8247E5, #6C4DF6);
+  border: none; cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: filter .12s;
+  margin-right: auto;
+}
+.mobile-menu-btn:hover { filter: brightness(1.15); }
+
+/* ── Sidebar backdrop (click-open mode) ──────────────── */
+.sidebar-backdrop {
+  position: fixed; inset: 0; z-index: 99;
+  background: rgba(0, 0, 0, .45);
+  animation: fadeIn .15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .sidebar { width: 200px; }
+  .card    { width: 100%; max-width: 440px; }
+}
+@media (max-width: 700px) {
+  /* Sidebar becomes a fixed overlay drawer */
+  .sidebar {
+    position: fixed; left: 0; top: 0; height: 100vh; z-index: 100;
+    transform: translateX(-100%);
+    transition: transform .25s ease, box-shadow .25s ease;
+    box-shadow: none;
+    width: 240px;
+  }
+  .sidebar.mobile-visible {
+    transform: translateX(0);
+    box-shadow: 6px 0 32px rgba(0, 0, 0, .5);
+  }
+
+  /* Show logo button in navbar */
+  .mobile-menu-btn { display: flex; }
+
+  .content  { padding: 12px; }
+  .card     { width: 100%; max-width: 100%; }
+  .content-inner .timeline { width: 100%; }
+
+  /* Stack network/token selects and balance vertically */
+  .well-row { flex-wrap: wrap; gap: 8px; }
+  .balance-field { width: 100%; text-align: left; margin-left: 0; margin-top: 0; }
+  .balance-value { height: auto; justify-content: flex-start; font-size: 13px; }
+
+  /* Amount input + pills */
+  .amount-row   { flex-wrap: wrap; gap: 8px; }
+  .amount-input { font-size: 26px; }
+  .pills { flex-wrap: wrap; }
+  .pill  { padding: 6px 9px; font-size: 12px; }
+
+  /* Receive row */
+  .receive-value { font-size: 15px; }
+
+  /* Navbar */
+  .navbar { padding: 0 12px; gap: 8px; }
+
+  /* Page content */
+  .page { padding: 16px; }
+}
 
 /* ── Bridge Timeline ─────────────────────────────────── */
 .timeline         { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px; min-width: 260px; }

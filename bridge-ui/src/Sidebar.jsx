@@ -17,9 +17,13 @@ const NAV = [
   },
 ]
 
-export default function Sidebar({ active, onNav }) {
+export default function Sidebar({ active, onNav, mobileVisible, onHoverStart, onHoverEnd }) {
   return (
-    <aside className="sidebar">
+    <aside
+      className={`sidebar${mobileVisible ? ' mobile-visible' : ''}`}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+    >
       <div className="brand">
         <div className="brand-mark">
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">

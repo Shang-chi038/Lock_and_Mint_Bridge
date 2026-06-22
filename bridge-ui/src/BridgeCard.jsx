@@ -82,7 +82,7 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
     if (!account) { setWBalance(0); return }
     mintReadOnly.balanceOf(account)
       .then((raw) => setWBalance(Number(ethers.formatUnits(raw, 18))))
-      .catch(() => setWBalance(0))
+      .catch((e) => { console.error('[wTST balance]', e); setWBalance(0) })
   }, [account, status])
 
   function swapNetworks() {
@@ -140,7 +140,7 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
         } catch {}
       }
       onAdvance('LOCKED')
-      if (nonce !== null) onLocked(nonce)
+      if (nonce !== null) onLocked({ nonce, hash: tx.hash, amount: String(amtNum) })
     } catch (e) {
       setTxError(e.reason || e.message || 'Lock failed')
     } finally {

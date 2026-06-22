@@ -25,7 +25,7 @@ todo.txt
 task.txt
 lock_*.txt
 lock_*.md
-presentation.txt
+presentation*
 
 # OS
 .DS_Store
@@ -48,4 +48,4 @@ gstack/
 **/gstack/
 
 # Claude note
-claude.md
+Claude.md

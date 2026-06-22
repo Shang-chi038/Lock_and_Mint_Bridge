@@ -12,7 +12,7 @@ const Moon = () => (
   </svg>
 )
 
-export default function NavBar({ theme, onToggleTheme, account, onConnect }) {
+export default function NavBar({ theme, onToggleTheme, account, onConnect, onMenuClick, onMenuHoverStart, onMenuHoverEnd }) {
   const [moreOpen, setMoreOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -24,6 +24,20 @@ export default function NavBar({ theme, onToggleTheme, account, onConnect }) {
 
   return (
     <header className="navbar">
+      <button
+        className="mobile-menu-btn"
+        onClick={onMenuClick}
+        onMouseEnter={onMenuHoverStart}
+        onMouseLeave={onMenuHoverEnd}
+        title="Menu"
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 15h16"/><path d="M6 15V4.3M14 15V4.3"/>
+          <path d="M2 14.5Q3 4.8 6 4.3Q10 12 14 4.3Q17 4.8 18 14.5"/>
+          <path d="M10 8.6V15"/>
+        </svg>
+      </button>
+
       <button className="icon-btn" onClick={onToggleTheme} title="Toggle theme">
         {theme === 'dark' ? <Sun /> : <Moon />}
       </button>

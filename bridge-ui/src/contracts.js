@@ -7,7 +7,7 @@ export const ADDRESSES = {
 }
 
 const SEPOLIA_RPC = import.meta.env.VITE_SEPOLIA_RPC_URL
-const AMOY_RPC    = import.meta.env.VITE_AMOY_RPC_URL
+const AMOY_RPC    = import.meta.env.VITE_AMOY_RPC_URL || 'https://rpc-amoy.polygon.technology'
 
 // Read-only providers — used for polling both chains without MetaMask
 export const sepoliaProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC)
