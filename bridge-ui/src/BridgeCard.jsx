@@ -74,17 +74,20 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
     if (!account) { setBalance(0); return }
     ;(async () => {
       try {
-        if (window.ethereum && network === '0xaa36a7') {
+        console.log('[TST balance] ADDRESSES.TST:', ADDRESSES.TST, 'network:', network, 'account:', account)
+        if (window.ethereum && network === '0xaa36a7' && ADDRESSES.TST) {
           // User is on Sepolia — read straight from MetaMask, no external RPC key needed
           const provider = new ethers.BrowserProvider(window.ethereum)
           const tst = new ethers.Contract(ADDRESSES.TST, TST_ABI, provider)
           const raw = await tst.balanceOf(account)
           const parsed = Number(ethers.formatUnits(raw, 18))
-          console.log('[TST balance] address:', ADDRESSES.TST, 'account:', account, 'balance:', parsed)
+          console.log('[TST balance] result:', parsed)
           setBalance(parsed)
         } else if (tstReadOnly) {
           const raw = await tstReadOnly.balanceOf(account)
           setBalance(Number(ethers.formatUnits(raw, 18)))
+        } else {
+          console.warn('[TST balance] VITE_TST_ADDRESS not set — check Railway env vars')
         }
       } catch (e) {
         console.error('[TST balance]', e)
