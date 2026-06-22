@@ -1,9 +1,15 @@
 import { ethers } from 'ethers'
 
+// Trim whitespace and checksum — guards against copy-paste newlines in Railway env vars
+// Returns null if the value is missing or not a valid address
+const toAddr = (val) => {
+  try { return ethers.getAddress((val || '').trim()) } catch { return null }
+}
+
 export const ADDRESSES = {
-  TST:           import.meta.env.VITE_TST_ADDRESS,
-  LOCK_CONTRACT: import.meta.env.VITE_LOCK_CONTRACT_ADDRESS,
-  MINT_CONTRACT: import.meta.env.VITE_MINT_CONTRACT_ADDRESS,
+  TST:           toAddr(import.meta.env.VITE_TST_ADDRESS),
+  LOCK_CONTRACT: toAddr(import.meta.env.VITE_LOCK_CONTRACT_ADDRESS),
+  MINT_CONTRACT: toAddr(import.meta.env.VITE_MINT_CONTRACT_ADDRESS),
 }
 
 const SEPOLIA_RPC = import.meta.env.VITE_SEPOLIA_RPC_URL || 'https://rpc.sepolia.org'
