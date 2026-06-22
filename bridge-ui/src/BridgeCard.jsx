@@ -98,9 +98,15 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
 
   // Fetch real wTST balance on Amoy
   useEffect(() => {
-    if (!account || !mintReadOnly) { setWBalance(0); return }
+    if (!account) { setWBalance(0); return }
+    console.log('[wTST balance] mintReadOnly:', mintReadOnly, 'MINT_CONTRACT:', ADDRESSES.MINT_CONTRACT)
+    if (!mintReadOnly) { setWBalance(0); return }
     mintReadOnly.balanceOf(account)
-      .then((raw) => setWBalance(Number(ethers.formatUnits(raw, 18))))
+      .then((raw) => {
+        const parsed = Number(ethers.formatUnits(raw, 18))
+        console.log('[wTST balance] result:', parsed)
+        setWBalance(parsed)
+      })
       .catch((e) => { console.error('[wTST balance]', e); setWBalance(0) })
   }, [account, status])
 
