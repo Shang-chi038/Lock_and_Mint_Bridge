@@ -36,9 +36,9 @@ export const MINT_ABI = [
 ]
 
 // Read-only contract instances (for polling)
-export const tstReadOnly  = new ethers.Contract(ADDRESSES.TST,           TST_ABI,  sepoliaProvider)
-export const lockReadOnly = new ethers.Contract(ADDRESSES.LOCK_CONTRACT,  LOCK_ABI, sepoliaProvider)
-export const mintReadOnly = new ethers.Contract(ADDRESSES.MINT_CONTRACT,  MINT_ABI, amoyProvider)
+export const tstReadOnly  = ADDRESSES.TST           ? new ethers.Contract(ADDRESSES.TST,           TST_ABI,  sepoliaProvider) : null
+export const lockReadOnly = ADDRESSES.LOCK_CONTRACT ? new ethers.Contract(ADDRESSES.LOCK_CONTRACT,  LOCK_ABI, sepoliaProvider) : null
+export const mintReadOnly = ADDRESSES.MINT_CONTRACT ? new ethers.Contract(ADDRESSES.MINT_CONTRACT,  MINT_ABI, amoyProvider)    : null
 
 // Returns signer-connected contract instances for write calls
 export function getSignerContracts(signer) {
