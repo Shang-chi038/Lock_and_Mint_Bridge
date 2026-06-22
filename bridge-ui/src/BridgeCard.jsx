@@ -74,20 +74,15 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
     if (!account) { setBalance(0); return }
     ;(async () => {
       try {
-        console.log('[TST balance] ADDRESSES.TST:', ADDRESSES.TST, 'network:', network, 'account:', account)
         if (window.ethereum && network === '0xaa36a7' && ADDRESSES.TST) {
           // User is on Sepolia — read straight from MetaMask, no external RPC key needed
           const provider = new ethers.BrowserProvider(window.ethereum)
           const tst = new ethers.Contract(ADDRESSES.TST, TST_ABI, provider)
           const raw = await tst.balanceOf(account)
-          const parsed = Number(ethers.formatUnits(raw, 18))
-          console.log('[TST balance] result:', parsed)
-          setBalance(parsed)
+          setBalance(Number(ethers.formatUnits(raw, 18)))
         } else if (tstReadOnly) {
           const raw = await tstReadOnly.balanceOf(account)
           setBalance(Number(ethers.formatUnits(raw, 18)))
-        } else {
-          console.warn('[TST balance] VITE_TST_ADDRESS not set — check Railway env vars')
         }
       } catch (e) {
         console.error('[TST balance]', e)
@@ -99,15 +94,10 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
   // Fetch real wTST balance on Amoy
   useEffect(() => {
     if (!account) { setWBalance(0); return }
-    console.log('[wTST balance] mintReadOnly:', mintReadOnly, 'MINT_CONTRACT:', ADDRESSES.MINT_CONTRACT)
     if (!mintReadOnly) { setWBalance(0); return }
     mintReadOnly.balanceOf(account)
-      .then((raw) => {
-        const parsed = Number(ethers.formatUnits(raw, 18))
-        console.log('[wTST balance] result:', parsed)
-        setWBalance(parsed)
-      })
-      .catch((e) => { console.error('[wTST balance]', e); setWBalance(0) })
+      .then((raw) => setWBalance(Number(ethers.formatUnits(raw, 18))))
+      .catch(() => setWBalance(0))
   }, [account, status])
 
   function swapNetworks() {
