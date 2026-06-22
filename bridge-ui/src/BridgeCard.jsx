@@ -79,7 +79,9 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
           const provider = new ethers.BrowserProvider(window.ethereum)
           const tst = new ethers.Contract(ADDRESSES.TST, TST_ABI, provider)
           const raw = await tst.balanceOf(account)
-          setBalance(Number(ethers.formatUnits(raw, 18)))
+          const parsed = Number(ethers.formatUnits(raw, 18))
+          console.log('[TST balance] address:', ADDRESSES.TST, 'account:', account, 'balance:', parsed)
+          setBalance(parsed)
         } else if (tstReadOnly) {
           const raw = await tstReadOnly.balanceOf(account)
           setBalance(Number(ethers.formatUnits(raw, 18)))
