@@ -11,7 +11,12 @@ const AMOY_RPC    = import.meta.env.VITE_AMOY_RPC_URL || 'https://rpc-amoy.polyg
 
 // Read-only providers — used for polling both chains without MetaMask
 export const sepoliaProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC)
-export const amoyProvider    = new ethers.JsonRpcProvider(AMOY_RPC)
+// staticNetwork: true prevents ethers v6 from attempting ENS resolution on Amoy (unsupported)
+export const amoyProvider    = new ethers.JsonRpcProvider(
+  AMOY_RPC,
+  { chainId: 80002, name: 'matic-amoy' },
+  { staticNetwork: true }
+)
 
 // Minimal ABIs
 export const TST_ABI = [
