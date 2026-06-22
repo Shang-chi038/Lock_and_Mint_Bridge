@@ -6,7 +6,7 @@ export const ADDRESSES = {
   MINT_CONTRACT: import.meta.env.VITE_MINT_CONTRACT_ADDRESS,
 }
 
-const SEPOLIA_RPC = import.meta.env.VITE_SEPOLIA_RPC_URL
+const SEPOLIA_RPC = import.meta.env.VITE_SEPOLIA_RPC_URL || 'https://rpc.sepolia.org'
 const AMOY_RPC    = import.meta.env.VITE_AMOY_RPC_URL || 'https://rpc-amoy.polygon.technology'
 
 // Read-only providers — used for polling both chains without MetaMask

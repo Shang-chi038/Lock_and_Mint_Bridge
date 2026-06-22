@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { ethers } from 'ethers'
-import { tstReadOnly, mintReadOnly, getSignerContracts, ADDRESSES } from './contracts'
+import { tstReadOnly, mintReadOnly, getSignerContracts, ADDRESSES, TST_ABI } from './contracts'
 
 const NETWORKS = [
   { id: 'sepolia', name: 'Sepolia',         color: '#627EEA', symbol: 'S' },
@@ -71,11 +71,25 @@ export default function BridgeCard({ account, network, onConnect, onSwitchNetwor
 
   // Fetch real TST balance on Sepolia
   useEffect(() => {
-    if (!account || !tstReadOnly) { setBalance(0); return }
-    tstReadOnly.balanceOf(account)
-      .then((raw) => setBalance(Number(ethers.formatUnits(raw, 18))))
-      .catch(() => setBalance(0))
-  }, [account, status])
+    if (!account) { setBalance(0); return }
+    ;(async () => {
+      try {
+        if (window.ethereum && network === '0xaa36a7') {
+          // User is on Sepolia — read straight from MetaMask, no external RPC key needed
+          const provider = new ethers.BrowserProvider(window.ethereum)
+          const tst = new ethers.Contract(ADDRESSES.TST, TST_ABI, provider)
+          const raw = await tst.balanceOf(account)
+          setBalance(Number(ethers.formatUnits(raw, 18)))
+        } else if (tstReadOnly) {
+          const raw = await tstReadOnly.balanceOf(account)
+          setBalance(Number(ethers.formatUnits(raw, 18)))
+        }
+      } catch (e) {
+        console.error('[TST balance]', e)
+        setBalance(0)
+      }
+    })()
+  }, [account, network, status])
 
   // Fetch real wTST balance on Amoy
   useEffect(() => {
